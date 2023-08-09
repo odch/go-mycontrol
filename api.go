@@ -13,14 +13,21 @@ const (
 	BaseURLV1 = "https://mycontrol.aero/api/1.0"
 )
 
-type Client struct {
+type Client interface {
+	GetToken() (string, error)
+	GetFlight(id string) (*Flight, error)
+	GetFlights(options *FlightsListOptions) (*FlightsList, error)
+	AddFlight(flight *Flight) (*Flight, error)
+}
+
+type client struct {
 	baseURL    string
 	apiKey     string
 	HTTPClient *http.Client
 }
 
-func NewClient(apiKey string) *Client {
-	return &Client{
+func NewClient(apiKey string) Client {
+	return &client{
 		baseURL: BaseURLV1,
 		apiKey:  base64.StdEncoding.EncodeToString([]byte(apiKey + ":")),
 		HTTPClient: &http.Client{
@@ -42,7 +49,7 @@ type errorResponse struct {
 }
 
 // Content-type and body should be already added to req
-func (c *Client) sendRequest(req *http.Request, v interface{}) error {
+func (c *client) sendRequest(req *http.Request, v interface{}) error {
 	req.Header.Set("Accept", "application/json; charset=utf-8")
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", c.apiKey))
 

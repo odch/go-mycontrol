@@ -9,7 +9,7 @@ type Token struct {
 	Token string `json:"token"`
 }
 
-func (c *Client) GetToken() (string, error) {
+func (c *client) GetToken() (string, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/token", c.baseURL), nil)
 	if err != nil {
 		return "", err

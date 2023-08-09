@@ -59,7 +59,7 @@ type LinkHref struct {
 	Href string `json:"href"`
 }
 
-func (c *Client) GetFlights(options *FlightsListOptions) (*FlightsList, error) {
+func (c *client) GetFlights(options *FlightsListOptions) (*FlightsList, error) {
 	limit := 100
 	page := 1
 	if options != nil {
@@ -80,7 +80,7 @@ func (c *Client) GetFlights(options *FlightsListOptions) (*FlightsList, error) {
 	return &res, nil
 }
 
-func (c *Client) GetFlight(id string) (*Flight, error) {
+func (c *client) GetFlight(id string) (*Flight, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/flights/%s", c.baseURL, id), nil)
 	if err != nil {
 		return nil, err
@@ -94,13 +94,12 @@ func (c *Client) GetFlight(id string) (*Flight, error) {
 	return &res, nil
 }
 
-func (c *Client) AddFlight(flight *Flight) (*Flight, error) {
+func (c *client) AddFlight(flight *Flight) (*Flight, error) {
 	w := bytes.NewBuffer(nil)
 	if err := json.NewEncoder(w).Encode(flight); err != nil {
 		return nil, err
 	}
 
-	fmt.Println(string(w.Bytes()))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/flights", c.baseURL), w)
 	if err != nil {
 		return nil, err
