@@ -23,13 +23,15 @@ type Client interface {
 type client struct {
 	baseURL    string
 	apiKey     string
+	token      string
 	HTTPClient *http.Client
 }
 
 func NewClient(apiKey string) Client {
 	return &client{
 		baseURL: BaseURLV1,
-		apiKey:  base64.StdEncoding.EncodeToString([]byte(apiKey + ":")),
+		apiKey:  apiKey,
+		token:   "",
 		HTTPClient: &http.Client{
 			Timeout: time.Minute,
 		},
@@ -50,8 +52,14 @@ type errorResponse struct {
 
 // Content-type and body should be already added to req
 func (c *client) sendRequest(req *http.Request, v interface{}) error {
+	token := c.token
+	if token == "" {
+		token = c.apiKey
+	}
 	req.Header.Set("Accept", "application/json; charset=utf-8")
-	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", c.apiKey))
+
+	basicToken := base64.StdEncoding.EncodeToString([]byte(token + ":"))
+	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", basicToken))
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {

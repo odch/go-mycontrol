@@ -10,6 +10,8 @@ type Token struct {
 }
 
 func (c *client) GetToken() (string, error) {
+	// clear token
+	c.token = ""
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/token", c.baseURL), nil)
 	if err != nil {
 		return "", err
@@ -19,6 +21,7 @@ func (c *client) GetToken() (string, error) {
 	if err := c.sendRequest(req, &res); err != nil {
 		return "", err
 	}
-
+	// update token
+	c.token = res.Token
 	return res.Token, nil
 }
